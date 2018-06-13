@@ -11,10 +11,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b20b08d6d4ed459ba615f8b39906e2c, type: 3}
   m_Name: BuildPrefs
   m_EditorClassIdentifier: 
-  ProjectName: TestProject
+  ProjectName: Untitled
   ProjectVersion: 0.0.1
   ScenePaths:
   - Assets/Scenes/TestScene.unity
-  BuildFolder: Builds/
-  Options: 08000000
-  Targets: 0d00000013000000
+  BuildFolder: Builds
+  Options: 
+  Targets: 13000000050000000d000000
