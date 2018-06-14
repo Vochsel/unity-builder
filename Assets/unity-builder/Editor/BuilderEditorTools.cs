@@ -17,18 +17,25 @@ public class BuilderEditorTools : MonoBehaviour {
 		
 	}
 
-	[MenuItem("Builder/Create Build Preferences", priority = 0)]
-	public static void CreateBuildPreferences()
-	{
-		BuildPreferences asset = ScriptableObject.CreateInstance<BuildPreferences>();
-        
+    [MenuItem("Builder/Utils/Create Build Preferences", priority = 0)]
+    public static void CreateBuildPreferences()
+    {
+        BuildPreferences asset = ScriptableObject.CreateInstance<BuildPreferences>();
 
-        if(!AssetDatabase.IsValidFolder("Assets/Resources"))
-            AssetDatabase.CreateFolder ("Assets", "Resources");
-        if (!AssetDatabase.IsValidFolder("Assets/Resources/Preferences"))
-            AssetDatabase.CreateFolder ("Assets/Resources", "Preferences");
+        if (Resources.Load<BuildPreferences>("Preferences/BuildPrefs"))
+        {
+            Debug.Log("BuildPrefs already exists in Resources folder!");
+            return;
+        }
 
-		AssetDatabase.CreateAsset(asset, "Assets/Resources/Preferences/BuildPrefs.asset");
+        if (!AssetDatabase.IsValidFolder("Assets/unity-builder"))
+            AssetDatabase.CreateFolder("Assets", "unity-builder");
+        if (!AssetDatabase.IsValidFolder("Assets/unity-builder/Resources"))
+            AssetDatabase.CreateFolder ("Assets/unity-builder", "Resources");
+        if (!AssetDatabase.IsValidFolder("Assets/unity-builder/Resources/Preferences"))
+            AssetDatabase.CreateFolder ("Assets/unity-builder/Resources", "Preferences");
+
+		AssetDatabase.CreateAsset(asset, "Assets/unity-builder/Resources/Preferences/BuildPrefs.asset");
 		AssetDatabase.SaveAssets();
 
 		EditorUtility.FocusProjectWindow();
@@ -45,7 +52,16 @@ public class BuilderEditorTools : MonoBehaviour {
 		}
 	}
 
-	public static void BuildAny(BuildTarget a_platform){
+    [MenuItem("Builder/Utils/Open Build Folder")]
+    public static void OpenBuildFolder()
+    {
+        BuildPreferences prefs = Resources.Load<BuildPreferences>("Preferences/BuildPrefs");
+
+        System.Diagnostics.Process.Start(@prefs.BuildFolder);
+    }
+
+
+    public static void BuildAny(BuildTarget a_platform){
 
 		string platformName = a_platform.ToString ();
 
@@ -55,9 +71,13 @@ public class BuilderEditorTools : MonoBehaviour {
 		BuildPreferences prefs = Resources.Load<BuildPreferences>("Preferences/BuildPrefs");
 
 		BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-		buildPlayerOptions.scenes = prefs.ScenePaths;
 
-		Debug.Log (buildPlayerOptions.scenes);
+        //Get scenes from build settings
+        buildPlayerOptions.scenes = new string[EditorBuildSettings.scenes.Length];
+        for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
+            buildPlayerOptions.scenes[i] = EditorBuildSettings.scenes[i].path;
+
+        Debug.Log (buildPlayerOptions.scenes);
         
         buildPlayerOptions.locationPathName = string.Format("{0}\\{3}\\{2}\\{3}_{2}_{1}{4}",
             Path.GetFullPath(Application.dataPath + "/../" + prefs.BuildFolder), 
